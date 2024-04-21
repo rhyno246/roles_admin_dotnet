@@ -4,7 +4,7 @@ namespace Api_demo.Core.Dtos
 {
     public class UpdatePermissionDto
     {
-        [Required(ErrorMessage = "UserName is required")]
-        public string? UserName { get; set; } 
+        [Required(ErrorMessage = "Email is required")]
+        public string? Email { get; set; } 
     }
 }

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Api_demo.Core.Dtos;
 using Api_demo.Core.OrtherObjects;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -101,6 +102,30 @@ namespace Api_demo.Controllers
             return Ok(token);
         }
 
+        [HttpGet]
+        [Route("GetUsersRole")]
+        [Authorize(Roles = StaticUserRoles.USER)]
+        public IActionResult GetUsersRole ()
+        {
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("GetOwnerRole")]
+        [Authorize(Roles = StaticUserRoles.OWNER)]
+        public IActionResult GetOwnerRole ()
+        {
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("GetAdminRole")]
+        [Authorize(Roles = StaticUserRoles.ADMIN)]
+        public IActionResult GetAdminRole ()
+        {
+            return Ok();
+        }
+
         private string GenerateNewJsonWebToken(List<Claim> claims)
         {
             var authSecret = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
@@ -113,6 +138,18 @@ namespace Api_demo.Controllers
             );
             string token = new JwtSecurityTokenHandler().WriteToken(tokenObject);
             return token;
+        }
+        [HttpPost]
+        [Route("make-admin")]
+        public async Task<IActionResult> MakeAdmin ([FromBody] UpdatePermissionDto updatePermissionDto) 
+        {
+            var user = await _userManager.FindByEmailAsync(updatePermissionDto.Email);
+            if(user == null)
+            {
+                return BadRequest("Invalid Email");
+            }
+            await _userManager.AddToRoleAsync(user, StaticUserRoles.ADMIN);
+            return Ok("User update status success");
         }
     }
 }
